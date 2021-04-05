@@ -50,8 +50,6 @@ def logout(request):
 		return redirect('/')
 
 def create_user(request):
-	if 'email' in request.session:
-		return redirect('home/')
 	if request.method == 'POST':
 		name = request.POST.get('name')
 		email = request.POST.get('email')                    

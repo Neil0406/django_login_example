@@ -1,13 +1,7 @@
-import requests
-import pandas as pd
 from datetime import datetime
-import numpy as np
-import re
-import json
-import time
 from elasticsearch import helpers, Elasticsearch
+from mysite.login_app.utils.password_encode import PasswordEncode
 
-es = Elasticsearch(hosts='localhost', port=9200)
 
 class CreateIndex():
     def create_index(self, es):
@@ -45,6 +39,9 @@ class CreateIndex():
                     "type": "date",
                     "format": "epoch_second"
                 },
+                'permissions':{
+                    "type": "integer"
+                },
                 'picture':{
                     "type": "keyword",
                     'index': 'false'
@@ -64,5 +61,23 @@ class CreateIndex():
 if __name__ == "__main__":
     es = Elasticsearch(hosts='localhost', port=9200)
     CreateIndex().create_index(es)
-
     es.indices.put_alias(index='a_user_info', name='user_info')
+
+    name = input('Your Name :')
+    email = input('Your Email :')
+    password = input('Your password :')
+    PasswordEncode = PasswordEncode()
+    key, encryptstr = PasswordEncode.encrypt(password)
+    datetime = datetime.now().timestamp()
+
+    body = {
+        'name':name, 
+        'email':email, 
+        'password_key': key,
+        'password_value': encryptstr,
+        'permissions' : 1,
+        'updated': int(datetime),
+        'created': int(datetime)
+    }
+    ret = es.index(index='a_user_info', body=body)
+    print(ret)

@@ -9,6 +9,7 @@ start Elasticsearch (localhost)
 ```
 1. cd ../django_login_example
 2. python3 create_mapping.py
+3. input your user info
 ```
 ## Django
 ### 1. Makemigrations & Migrate
@@ -17,7 +18,7 @@ start Elasticsearch (localhost)
 2. python3 manage.py makemigrations
 3. python3 manage.py migrate
 ```
-### 2. Runseerver
+### 2. Runserver
 ```
 1. cd ../django_login_example/mysite
 2. python3 manage.py runserver
