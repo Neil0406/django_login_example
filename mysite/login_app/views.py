@@ -3,10 +3,12 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 #from login_app.models import User
 
-from .utils.es_helpers import User
+from .utils.es_helpers import User, UserControl
 from .utils.password_encode import PasswordEncode
 import time
+import json
 User = User()
+UserControl = UserControl()
 PasswordEncode = PasswordEncode()
 
 
@@ -71,3 +73,133 @@ def update_user(request):
 		return render(request,'update_user.html',{'user':user['_source']})
 	else:
 		return redirect('/')	
+
+class User_Control():
+	def user_control(self, request):
+		if 'email' in request.session:
+			email = request.session['email']
+			user = User.get_user_info(email)
+			user = user['_source']
+			if user == 0:                                          
+				request.session.flush() 
+				return redirect('/')
+			if user['permissions'] == 1 or user['permissions'] == 2:
+				user_list = UserControl.user_list()
+				count = len(user_list)
+				return render(request,'user_control.html',locals())
+			else:
+				return redirect('/')
+		else:
+			return redirect('/')
+
+	def search_user_by_name(self, request):
+		if 'email' in request.session:
+			email = request.session['email']
+			user = User.get_user_info(email)
+			user = user['_source']
+			print(user)
+			if user == 0:                                          
+				request.session.flush() 
+				return redirect('/')
+			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
+				name = request.POST.get('name')
+				ret = UserControl.search_user_by_name(name)
+				print(ret)
+				ret = json.dumps({'data': ret})
+				return HttpResponse(ret)
+			else:
+				return redirect('/')
+		else:
+			return redirect('/')
+
+	def search_user_by_email(self, request):
+		if 'email' in request.session:
+			email = request.session['email']
+			user = User.get_user_info(email)
+			user = user['_source']
+			if user == 0:                                          
+				request.session.flush() 
+				return redirect('/')
+			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
+				email = request.POST.get('email')
+				ret = UserControl.search_user_by_email(email)
+				ret = json.dumps({'data': ret})			
+				return HttpResponse(ret)
+			else:
+				return redirect('/')
+		else:
+			return redirect('/')
+
+	def user_control_update(self, request):
+		if 'email' in request.session:
+			email = request.session['email']
+			user = User.get_user_info(email)
+			user = user['_source']
+			if user == 0:                                          
+				request.session.flush() 
+				return redirect('/')
+			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
+				_id = request.POST.get('_id')
+				id_list = _id.split(',')
+				ret = UserControl.search_user_by_id(id_list)
+				ret = json.dumps({'data': ret})			
+				return HttpResponse(ret)
+			else:
+				return redirect('/')
+		else:
+			return redirect('/')
+
+	def update(self, request):
+		if 'email' in request.session:
+			email = request.session['email']
+			user = User.get_user_info(email)
+			user = user['_source']
+			if user == 0:                                          
+				request.session.flush() 
+				return redirect('/')
+			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
+				name = request.POST.get('name')
+				email = request.POST.get('email')
+				days = request.POST.get('session_expire')
+				permissions = request.POST.get('permissions')
+				if days == '':
+					days = 0
+				else:
+					days = int(days)
+				if permissions == '最高':
+					permissions = 2
+				elif permissions == '中等':
+					permissions = 1
+				else:
+					permissions = 0
+				if name == '':
+					ret = json.dumps({'data': '請填選資料'})
+					return HttpResponse(ret)
+				else:
+					ret = UserControl.update_user(name, email, days, permissions)
+					time.sleep(1)	
+					ret = json.dumps({'data': ret})
+					return HttpResponse(ret)
+			else:
+				return redirect('/')
+		else:
+			return redirect('/')
+
+
+	def delete_user(self, request):
+		if 'email' in request.session:
+			email = request.session['email']
+			user = User.get_user_info(email)
+			user = user['_source']
+			if user == 0:                                          
+				request.session.flush() 
+				return redirect('/')
+			if user['permissions'] == 2 and request.method == 'POST':
+				_id = request.POST.get('_id')
+				id_list = _id.split(',')
+				ret = UserControl.delete_user(id_list)
+				return HttpResponse(ret)
+			else:
+				return redirect('/')
+		else:
+			return redirect('/')

@@ -75,7 +75,7 @@ if __name__ == "__main__":
         'email':email, 
         'password_key': key,
         'password_value': encryptstr,
-        'permissions' : 1,
+        'permissions' : 2,
         'updated': int(datetime),
         'created': int(datetime)
     }

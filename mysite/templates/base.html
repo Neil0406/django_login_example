@@ -74,7 +74,7 @@
                 <h3>Control</h3>
                 <ul class="nav side-menu">
                   <li><a href="/"><i class="fa fa-home"></i> Home </a></li>
-                  <li><a href="#"><i class="fa fa-cloud"></i> Example </a></li>
+                  <li><a href="/user_control"><i class="fa fa-cloud"></i> 權限設定 </a></li>
                   <li><a><i class="fa fa-edit"></i> Example1 <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="#">example1</a></li>
@@ -251,6 +251,9 @@
     <script src="{% static '/vendors/moment/min/moment.min.js' %}"></script>
     <script src="{% static '/vendors/fullcalendar/dist/fullcalendar.min.js' %}"></script>
     
+    {% block js%}
+    {% endblock %}
+
 	
   </body>
 </html>
