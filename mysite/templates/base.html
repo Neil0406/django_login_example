@@ -74,7 +74,11 @@
                 <h3>Control</h3>
                 <ul class="nav side-menu">
                   <li><a href="/"><i class="fa fa-home"></i> Home </a></li>
-                  <li><a href="/user_control"><i class="fa fa-cloud"></i> 權限設定 </a></li>
+
+                  {% if user.permissions == 1 or user.permissions == 2%}
+                    <li><a href="/user_control"><i class="fa fa-cloud"></i> 權限設定 </a></li>
+                  {% endif%}
+                  
                   <li><a><i class="fa fa-edit"></i> Example1 <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="#">example1</a></li>

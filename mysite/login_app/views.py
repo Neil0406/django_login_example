@@ -97,14 +97,12 @@ class User_Control():
 			email = request.session['email']
 			user = User.get_user_info(email)
 			user = user['_source']
-			print(user)
 			if user == 0:                                          
 				request.session.flush() 
 				return redirect('/')
 			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
 				name = request.POST.get('name')
 				ret = UserControl.search_user_by_name(name)
-				print(ret)
 				ret = json.dumps({'data': ret})
 				return HttpResponse(ret)
 			else:

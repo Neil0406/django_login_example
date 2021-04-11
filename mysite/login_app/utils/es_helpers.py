@@ -34,6 +34,7 @@ class User():
                 'password_key':password_key, 
                 'password_value':password_value,
                 'session_expire': int(ex),
+                'permissions' : 0,
                 'created': int(datetime.now().timestamp()),
                 'updated': int(datetime.now().timestamp())
             }
