@@ -75,7 +75,7 @@
                 <ul class="nav side-menu">
                   <li><a href="/"><i class="fa fa-home"></i> Home </a></li>
 
-                  {% if user.permissions == 1 or user.permissions == 2%}
+                  {% if user.permissions == 'Medium' or user.permissions == 'Height'%}
                     <li><a href="/user_control"><i class="fa fa-cloud"></i> 權限設定 </a></li>
                   {% endif%}
                   

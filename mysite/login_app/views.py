@@ -83,7 +83,7 @@ class User_Control():
 			if user == 0:                                          
 				request.session.flush() 
 				return redirect('/')
-			if user['permissions'] == 1 or user['permissions'] == 2:
+			if user['permissions'] == 'Medium' or user['permissions'] == 'Height':
 				user_list = UserControl.user_list()
 				count = len(user_list)
 				return render(request,'user_control.html',locals())
@@ -100,7 +100,7 @@ class User_Control():
 			if user == 0:                                          
 				request.session.flush() 
 				return redirect('/')
-			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
+			if user['permissions'] == 'Medium' or user['permissions'] == 'Height' and request.method == 'POST':
 				name = request.POST.get('name')
 				ret = UserControl.search_user_by_name(name)
 				ret = json.dumps({'data': ret})
@@ -118,7 +118,7 @@ class User_Control():
 			if user == 0:                                          
 				request.session.flush() 
 				return redirect('/')
-			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
+			if user['permissions'] == 'Medium' or user['permissions'] == 'Height' and request.method == 'POST':
 				email = request.POST.get('email')
 				ret = UserControl.search_user_by_email(email)
 				ret = json.dumps({'data': ret})			
@@ -136,7 +136,7 @@ class User_Control():
 			if user == 0:                                          
 				request.session.flush() 
 				return redirect('/')
-			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
+			if user['permissions'] == 'Medium' or user['permissions'] == 'Height' and request.method == 'POST':
 				_id = request.POST.get('_id')
 				id_list = _id.split(',')
 				ret = UserControl.search_user_by_id(id_list)
@@ -155,29 +155,15 @@ class User_Control():
 			if user == 0:                                          
 				request.session.flush() 
 				return redirect('/')
-			if user['permissions'] == 1 or user['permissions'] == 2 and request.method == 'POST':
-				name = request.POST.get('name')
-				email = request.POST.get('email')
-				days = request.POST.get('session_expire')
-				permissions = request.POST.get('permissions')
-				if days == '':
-					days = 0
-				else:
-					days = int(days)
-				if permissions == '最高':
-					permissions = 2
-				elif permissions == '中等':
-					permissions = 1
-				else:
-					permissions = 0
-				if name == '':
-					ret = json.dumps({'data': '請填選資料'})
-					return HttpResponse(ret)
-				else:
-					ret = UserControl.update_user(name, email, days, permissions)
-					time.sleep(1)	
-					ret = json.dumps({'data': ret})
-					return HttpResponse(ret)
+			if user['permissions'] == 'Medium' or user['permissions'] == 'Height' and request.method == 'POST':
+				up_list = request.POST.get('up_list')
+				up_list = json.loads(up_list)
+				for i in up_list:
+					i['session_expire'] = int(i['session_expire'])
+				ret = UserControl.update(up_list)
+				time.sleep(1)	
+				ret = json.dumps({'data': ret})
+				return HttpResponse(ret)
 			else:
 				return redirect('/')
 		else:
@@ -192,7 +178,7 @@ class User_Control():
 			if user == 0:                                          
 				request.session.flush() 
 				return redirect('/')
-			if user['permissions'] == 2 and request.method == 'POST':
+			if user['permissions'] == 'Height' and request.method == 'POST':
 				_id = request.POST.get('_id')
 				id_list = _id.split(',')
 				ret = UserControl.delete_user(id_list)

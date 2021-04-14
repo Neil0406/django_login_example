@@ -51,11 +51,11 @@
         <div class="col-md-12 col-sm-12  ">
             <div class="x_panel">
               <div class="x_title">
-                <h2>Search User <small><div class="spinner-border text-danger" role="status" id="loading" style="display: none;"></div></small></h2>
+                <h2>Search User <small></small></h2>
                 <div class="clearfix"></div>
               </div>
               <div class="x_content">
-                <p><code>Permissions(權限)</code> 普通 / 最高  </p>
+                <p><code>Permissions(權限)</code> Low / Medium / Height  </p>
                     <div class="table-responsive">
                         <table class="table table-striped jambo_table bulk_action">
                             <thead>
@@ -73,18 +73,17 @@
                             </tr>
                             </thead>
 
-                            <tbody>
-                                <tr class="even pointer" id='search_data'>
-                                    
-                                </tr>
+                            <tbody id='search_data'>
+                                <!-- <tr class="even pointer" ></tr> -->
                             </tbody>
+
                         </table>
-                        {% if user.permissions == 2%}
+                        {% if user.permissions == 'Height' %}
                             <div id='re_btn_lv2' style="display: block;">
                                 <button type="btn" class="btn btn-primary" id="update_search">修改</button>
                                 <button type="btn" class="btn btn-danger" id="delete_search">刪除</button>
                             </div>
-                        {% elif user.permissions == 1%}
+                        {% elif user.permissions == 'Medium' %}
                             <div id='re_btn_lv1' style="display: block;">
                                 <button type="btn" class="btn btn-primary" id="update_search">修改</button>
                             </div>
@@ -112,7 +111,7 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card-box table-responsive">
-                                <p><code>Permissions(權限)</code> 普通 /  最高 </p>
+                                <p><code>Permissions(權限)</code> Low / Medium / Height </p>
                                 <table id="datatable" class="table table-striped table-bordered" style="width:100%">
                                     <thead>
                                     <tr>
@@ -125,9 +124,9 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {% if user.permissions == 2%}
+                                    {% if user.permissions == 'Height'%}
                                         {% for i in user_list %}
-                                            {% if i.source.permissions == '最高'%}
+                                            {% if i.source.permissions == 'Height'%}
                                                 <tr>
                                                     <td><input type="checkbox" disabled> &nbsp; {{i.id}}</td>
                                                     <td>{{i.source.name}}</td>
@@ -136,7 +135,7 @@
                                                     <td>{{i.source.session_expire}}</td>
                                                     <td style="color: aquamarine;">{{i.source.permissions}}</td>
                                                 </tr>
-                                            {% elif i.source.permissions == '中等'%}
+                                            {% elif i.source.permissions == 'Medium'%}
                                                 <tr id='{{i.id}}'>
                                                     <td><input type="checkbox" name="default_data" value='{{i.id}}'> &nbsp; {{i.id}}</td>
                                                     <td>{{i.source.name}}</td>
@@ -158,9 +157,9 @@
                                         {% endfor %}
                                     {% endif %}
 
-                                    {% if user.permissions == 1%}
+                                    {% if user.permissions == 'Medium'%}
                                         {% for i in user_list %}
-                                            {% if i.source.permissions == '最高'%}
+                                            {% if i.source.permissions == 'Height'%}
                                                 <tr>
                                                     <td><input type="checkbox" disabled> &nbsp; {{i.id}}</td>
                                                     <td>{{i.source.name}}</td>
@@ -169,7 +168,7 @@
                                                     <td>{{i.source.session_expire}}</td>
                                                     <td style="color: aquamarine;">{{i.source.permissions}}</td>
                                                 </tr>
-                                            {% elif i.source.permissions == '中等'%}
+                                            {% elif i.source.permissions == 'Medium'%}
                                                 <tr>
                                                     <td><input type="checkbox" disabled> &nbsp; {{i.id}}</td>
                                                     <td>{{i.source.name}}</td>
@@ -194,17 +193,38 @@
                                     </tbody>
                                 </table>
                                 <br>
-                                {% if user.permissions == 2%}
-                                
-                                    <button type="btn" class="btn btn-primary" id="update_default">修改</button>
+                                {% if user.permissions == 'Height'%}
+                                    <button type="btn" class="btn btn-primary" id="default_search">修改</button>
                                     <button type="btn" class="btn btn-danger" id="delete_defaul">刪除</button>
-                                {% elif user.permissions == 1%}
-                                    <button type="btn" class="btn btn-primary" id="update_default">修改</button>
+                                {% elif user.permissions == 'Medium'%}
+                                    <button type="btn" class="btn btn-primary" id="default_search">修改</button>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
+
+
+                <div class="x_content" id='show_default' style="display: none;">
+                    <div class="spinner-border text-danger" role="status" id='default_loading' style="display: none;"></div>
+                    <div class="row">
+                        <div class="col-md-3 col-sm-12  form-group">
+                            <h5>Name</h5>
+                        </div>
+                        <div class="col-md-3 col-sm-12  form-group">
+                            <h5>Email</h5>
+                        </div>
+                        <div class="col-md-3 col-sm-12  form-group">
+                            <h5>SessionExpire&nbsp;&nbsp;(+Days)</h5>
+                        </div>
+                        <div class="col-md-3 col-sm-12 form-group">
+                            <h5>Permissions</h5>
+                        </div>
+                    </div>
+                    
+                    <div id='show_default_data'></div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -217,7 +237,7 @@
     <!-- Datatables -->
     <script src="{% static '/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static '/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
-    <script src="{% static '/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <!-- <script src="{% static '/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
     <script src="{% static '/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
     <script src="{% static '/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
     <script src="{% static '/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
@@ -229,7 +249,7 @@
     <script src="{% static '/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
     <script src="{% static '/vendors/jszip/dist/jszip.min.js' %}"></script>
     <script src="{% static '/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-    <script src="{% static '/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+    <script src="{% static '/vendors/pdfmake/build/vfs_fonts.js' %}"></script> -->
 
 
 
@@ -243,6 +263,7 @@
     $('#search_user_by_name').click(function () {  
         var name = document.getElementById('name')
         $('#show_update').empty();
+        $('#search_data').empty();
         $.ajax({
             url: '/search_user_by_name/',  
             type: 'POST',  
@@ -254,33 +275,38 @@
                 var data = JSON.parse(data);
                 $('#show_search').fadeIn();
                 if (data.data != 0){
-                    {% if user.permissions == 2%}
-                        if (data.data._source.permissions == '最高'){
-                            document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" disabled></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last" ><a href="#" style="color: aquamarine;">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv2').style.display = 'none'
-                        }else if(data.data._source.permissions == '中等'){
-                            document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data._id+'"></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last" ><a href="#" style="color: darkkhaki;">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv2').style.display = 'block'
-                        }else{
-                            document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data._id+'"></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last"><a href="#">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv2').style.display = 'block'
+                    {% if user.permissions == 'Height'%}
+                        for(i=0; i<data.data.length; i++){
+                            if (data.data[i]._source.permissions == 'Height'){
+                                document.getElementById('search_data').innerHTML +=  '<tr class="even pointer" ><td class="a-center"><input type="checkbox" disabled></td><td>'+data.data[i]._id+'</td><td>'+data.data[i]._source.name+'</td><td class="">'+data.data[i]._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data[i]._source.created+'</td><td class="">'+data.data[i]._source.updated+'</td><td class="a-right a-right ">'+data.data[i]._source.session_expire+'</td><td class=" last" ><a href="#" style="color: aquamarine;">'+data.data[i]._source.permissions+'</a></td></tr>'
+                            }else if(data.data[i]._source.permissions == 'Medium'){
+                                document.getElementById('search_data').innerHTML +=  '<tr class="even pointer" ><td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data[i]._id+'"></td><td>'+data.data[i]._id+'</td><td>'+data.data[i]._source.name+'</td><td class="">'+data.data[i]._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data[i]._source.created+'</td><td class="">'+data.data[i]._source.updated+'</td><td class="a-right a-right ">'+data.data[i]._source.session_expire+'</td><td class=" last" ><a href="#" style="color: darkkhaki;">'+data.data[i]._source.permissions+'</a></td></tr>'
+                            }else{
+                                document.getElementById('search_data').innerHTML +=  '<tr class="even pointer" ><td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data[i]._id+'"></td><td>'+data.data[i]._id+'</td><td>'+data.data[i]._source.name+'</td><td class="">'+data.data[i]._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data[i]._source.created+'</td><td class="">'+data.data[i]._source.updated+'</td><td class="a-right a-right ">'+data.data[i]._source.session_expire+'</td><td class=" last"><a href="#">'+data.data[i]._source.permissions+'</a></td></tr>'
+                            }
+
                         }
-                    {% elif user.permissions == 1%}
-                        if (data.data._source.permissions == '最高'){
-                            document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" disabled></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last" ><a href="#" style="color: aquamarine;">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv1').style.display = 'none'
-                        }else if(data.data._source.permissions == '中等'){
-                            document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" disabled></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last" ><a href="#" style="color: darkkhaki;">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv1').style.display = 'none'
-                        }else{
-                            document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data._id+'"></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last"><a href="#">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv1').style.display = 'block'
+                        document.getElementById('re_btn_lv2').style.display = 'block'
+                    {% elif user.permissions == 'Medium'%}
+                        for(i=0; i<data.data.length; i++){
+                            if (data.data[i]._source.permissions == 'Height'){
+                                document.getElementById('search_data').innerHTML +=  '<tr class="even pointer" ><td class="a-center"><input type="checkbox" disabled></td><td>'+data.data[i]._id+'</td><td>'+data.data[i]._source.name+'</td><td class="">'+data.data[i]._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data[i]._source.created+'</td><td class="">'+data.data[i]._source.updated+'</td><td class="a-right a-right ">'+data.data[i]._source.session_expire+'</td><td class=" last" ><a href="#" style="color: aquamarine;">'+data.data[i]._source.permissions+'</a></td>'
+                            }else if(data.data[i]._source.permissions == 'Medium'){
+                                document.getElementById('search_data').innerHTML +=  '<tr class="even pointer" ><td class="a-center"><input type="checkbox" disabled></td><td>'+data.data[i]._id+'</td><td>'+data.data[i]._source.name+'</td><td class="">'+data.data[i]._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data[i]._source.created+'</td><td class="">'+data.data[i]._source.updated+'</td><td class="a-right a-right ">'+data.data[i]._source.session_expire+'</td><td class=" last" ><a href="#" style="color: darkkhaki;">'+data.data[i]._source.permissions+'</a></td>'
+                            }else{
+                                document.getElementById('search_data').innerHTML +=  '<tr class="even pointer" ><td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data[i]._id+'"></td><td>'+data.data[i]._id+'</td><td>'+data.data[i]._source.name+'</td><td class="">'+data.data[i]._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data[i]._source.created+'</td><td class="">'+data.data[i]._source.updated+'</td><td class="a-right a-right ">'+data.data[i]._source.session_expire+'</td><td class=" last"><a href="#">'+data.data[i]._source.permissions+'</a></td>'
+                            }
                         }
+                        document.getElementById('re_btn_lv1').style.display = 'block'
                     {% endif %}
 
                 }else{
                     document.getElementById('search_data').innerHTML =  '<td class="a-center">查無資料</td><td></td><td></td><td class=""><i class="success fa fa-long-arrow-up"></i></td><td class=""></td><td class=""></td><td class="a-right a-right "></td><td class="last"><a href="#"></a></td>'
-                    document.getElementById('re_btn_lv2').style.display = 'none'
+                    {% if user.permissions == 'Height'%}
+                        document.getElementById('re_btn_lv2').style.display = 'none'
+                    {% elif user.permissions == 'Medium'%}
+                        document.getElementById('re_btn_lv1').style.display = 'none'
+                    {% endif %}
                 }
             }  
         });
@@ -290,6 +316,7 @@
     $('#search_user_by_email').click(function () { 
         var name = document.getElementById('email')
         $('#show_update').empty();
+        $('#search_data').empty();
         $.ajax({
             url: '/search_user_by_email/',  
             type: 'POST',  
@@ -301,39 +328,39 @@
                 var data = JSON.parse(data);
                 $('#show_search').fadeIn();
                 if (data.data != 0){
-                    {% if user.permissions == 2%}
-                        if (data.data._source.permissions == '最高'){
+                    {% if user.permissions == 'Height' %}
+                        if (data.data._source.permissions == 'Height'){
                             document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" disabled></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last" ><a href="#" style="color: aquamarine;">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv2').style.display = 'none'
-                        }else if(data.data._source.permissions == '中等'){
+                        }else if(data.data._source.permissions == 'Medium'){
                             document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data._id+'"></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last" ><a href="#" style="color: darkkhaki;">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv2').style.display = 'block'
                         }else{
                             document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data._id+'"></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last"><a href="#">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv2').style.display = 'block'
                         }
-                    {% elif user.permissions == 1%}
-                        if (data.data._source.permissions == '最高'){
+                        document.getElementById('re_btn_lv2').style.display = 'block'
+                    {% elif user.permissions == 'Medium'%}
+                        if (data.data._source.permissions == 'Height'){
                             document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" disabled></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last" ><a href="#" style="color: aquamarine;">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv1').style.display = 'none'
-                        }else if(data.data._source.permissions == '中等'){
+                        }else if(data.data._source.permissions == 'Medium'){
                             document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" disabled></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last" ><a href="#" style="color: darkkhaki;">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv1').style.display = 'none'
                         }else{
                             document.getElementById('search_data').innerHTML =  '<td class="a-center"><input type="checkbox" name="search_data" value="'+ data.data._id+'"></td><td>'+data.data._id+'</td><td>'+data.data._source.name+'</td><td class="">'+data.data._source.email+'<i class="success fa fa-long-arrow-up"></i></td><td class="">'+data.data._source.created+'</td><td class="">'+data.data._source.updated+'</td><td class="a-right a-right ">'+data.data._source.session_expire+'</td><td class=" last"><a href="#">'+data.data._source.permissions+'</a></td>'
-                            document.getElementById('re_btn_lv1').style.display = 'block'
                         }
+                        document.getElementById('re_btn_lv1').style.display = 'block'
                     {% endif %}
                 }else{
                     document.getElementById('search_data').innerHTML =  '<td class="a-center">查無資料</td><td></td><td></td><td class=""><i class="success fa fa-long-arrow-up"></i></td><td class=""></td><td class=""></td><td class="a-right a-right "></td><td class="last"><a href="#"></a></td>'
-                    document.getElementById('re_btn_lv2').style.display = 'none'
+                    {% if user.permissions == 'Height'%}
+                        document.getElementById('re_btn_lv2').style.display = 'none'
+                    {% elif user.permissions == 'Medium'%}
+                        document.getElementById('re_btn_lv1').style.display = 'none'
+                    {% endif %}
                 }
             }  
         });
     });
 
     $('#update_search').click(function () {
-        $('#show_update').fadeOut();
+        $('#show_update').empty();
         var id_list = get_search_check_box();
         if(id_list.length != 0) {
             $.ajax({
@@ -345,13 +372,16 @@
                 },  
                 success: function (data) {
                     var data = JSON.parse(data);
+                    s = '<div class="spinner-border text-danger" role="status" id="search_loading" style="display: none;"></div><div class="row"><div class="col-md-3 col-sm-12  form-group"><h5>Name</h5></div><div class="col-md-3 col-sm-12  form-group"><h5>Email</h5></div><div class="col-md-3 col-sm-12  form-group"><h5>SessionExpire&nbsp;&nbsp;(+Days)</h5></div><div class="col-md-3 col-sm-12 form-group"><h5>Permissions</h5></div></div>'
                     for(i=0; i<data.data.length; i++){
-                        {% if user.permissions == 2%}
-                            document.getElementById('show_update').innerHTML = '<div class="row"><div class="col-md-3 col-sm-12  form-group"><h5>Name</h5><input type="text" placeholder="Name" class="form-control" id="up_name" value="' +data.data[i].source.name + '"></div><div class="col-md-3 col-sm-12  form-group"><h5>Email</h5><input type="email" placeholder="Email@example.com" class="form-control" id="up_email" value="' + data.data[i].source.email + '" disabled></div><div class="col-md-3 col-sm-12  form-group"><h5>SessionExpire&nbsp;&nbsp;(+Days)</h5><input type="number" placeholder="Days" class="form-control" id="up_session_expire" value="0"></div><div class="col-md-3 col-sm-12 form-group"><h5>Permissions</h5><select class="form-control" id="up_permissions"><option selected hidden value="' + data.data[i].source.permissions + '">' + data.data[i].source.permissions + '</option><option value="最高">最高</option></option><option value="中等">中等</option><option value="普通">普通</option></select></div></div><button type="btn" class="btn btn-primary" onclick="update()">變更</button>'
-                        {% elif user.permissions == 1%}
-                            document.getElementById('show_update').innerHTML = '<div class="row"><div class="col-md-3 col-sm-12  form-group"><h5>Name</h5><input type="text" placeholder="Name" class="form-control" id="up_name" value="' +data.data[i].source.name + '"></div><div class="col-md-3 col-sm-12  form-group"><h5>Email</h5><input type="email" placeholder="Email@example.com" class="form-control" id="up_email" value="' + data.data[i].source.email + '" disabled></div><div class="col-md-3 col-sm-12  form-group"><h5>SessionExpire&nbsp;&nbsp;(+Days)</h5><input type="number" placeholder="Days" class="form-control" id="up_session_expire" value="0"></div><div class="col-md-3 col-sm-12 form-group"><h5>Permissions</h5><select class="form-control" id="up_permissions"><option selected hidden value="普通">普通</option></select></div></div><button type="btn" class="btn btn-primary" onclick="update()">變更</button>'
+                        {% if user.permissions == 'Height'%}
+                            s += '<div class="row"><div class="col-md-3 col-sm-12  form-group"><input type="text" placeholder="Name" class="form-control" name="up_name" value="' +data.data[i].source.name + '"></div><div class="col-md-3 col-sm-12  form-group"><input type="email" placeholder="Email@example.com" class="form-control" name="up_email" value="' + data.data[i].source.email + '" disabled></div><div class="col-md-3 col-sm-12  form-group"><input type="number" placeholder="Days" class="form-control" name="up_session_expire" value="0"></div><div class="col-md-3 col-sm-12 form-group"><select class="form-control" name="up_permissions"><option selected hidden value="' + data.data[i].source.permissions + '">' + data.data[i].source.permissions + '</option><option value="Height">Height</option></option><option value="Medium">Medium</option><option value="Low">Low</option></select></div></div>'
+                        {% elif user.permissions == 'Medium'%}
+                            s += '<div class="row"><div class="col-md-3 col-sm-12  form-group"><input type="text" placeholder="Name" class="form-control" name="up_name" value="' +data.data[i].source.name + '"></div><div class="col-md-3 col-sm-12  form-group"><input type="email" placeholder="Email@example.com" class="form-control" name="up_email" value="' + data.data[i].source.email + '" disabled></div><div class="col-md-3 col-sm-12  form-group"><input type="number" placeholder="Days" class="form-control" name="up_session_expire" value="0"></div><div class="col-md-3 col-sm-12 form-group"><select class="form-control" name="up_permissions"><option selected hidden value="Low" >Low</option><option value="Low" >Low</option></select></div></div>'
                         {% endif %}
                     }
+                    s +='<button type="btn" class="btn btn-primary" onclick="update_search()">變更</button>'
+                    document.getElementById('show_update').innerHTML = s
                     $('#show_update').fadeIn();
                 }
             });
@@ -388,33 +418,38 @@
     });
 
 
-    function update(){
-        var up_name = document.getElementById('up_name').value
-        var up_email = document.getElementById('up_email').value
-        var up_session_expire = document.getElementById('up_session_expire').value
-        var up_permissions = document.getElementById('up_permissions').value
-        document.getElementById('loading').style.display = 'block'
+    function update_search(){
+        var name = document.getElementsByName('up_name')
+        var email = document.getElementsByName('up_email')
+        var session_expire = document.getElementsByName('up_session_expire')
+        var permissions = document.getElementsByName('up_permissions')
+        document.getElementById('search_loading').style.display = 'block'
+        var up_data = []
+        for(i=0; i< name.length; i++){
+            var n = name[i].value
+            var e = email[i].value
+            var s = session_expire[i].value
+            var p = permissions[i].value
+            up_data.push({'name':n ,'email':e, 'session_expire':s, 'permissions':p})
+        }
         $.ajax({
             url: '/update/',  
             type: 'POST',  
             headers: {'X-CSRFToken': $('[name="csrfmiddlewaretoken"]').val()},
             data: {
-                name: up_name,
-                email: up_email,
-                session_expire: up_session_expire,
-                permissions: up_permissions,
+                up_list: JSON.stringify(up_data),
+
             },  
             success: function (data) {
                 var data = JSON.parse(data);
                 if(data.data.status == 'success'){
-                    window.location.replace(location.href)
+                   window.location.replace(location.href)
+                }else{
+                    alert('更新失敗')
                 }
             }  
         });  
     }
-
-   
-
 </script>
 
 
@@ -425,9 +460,72 @@
         $('input:checkbox:checked[name="default_data"]').each(function(i) { cbxVehicle[i] = this.value; });
         return cbxVehicle
     }
+
+    $('#default_search').click(function(){
+        document.getElementById('show_default').style.display = 'none'
+        $('#show_default_data').empty()
+        var id_list = get_default_check_box()
+        if(id_list.length != 0) {
+            $.ajax({
+                url: '/user_control_update/',  
+                type: 'POST',  
+                headers: {'X-CSRFToken': $('[name="csrfmiddlewaretoken"]').val()},
+                data: {
+                    _id: String(id_list)
+                },  
+                success: function (data) {
+                    var data = JSON.parse(data);
+                    s = ''
+                    for(i=0; i<data.data.length; i++){
+                        {% if user.permissions == 'Height' %}
+                            s += '<div class="row"><div class="col-md-3 col-sm-12  form-group"><input type="text" placeholder="Name" class="form-control" name="up_de_name" value="'+ data.data[i].source.name +'" ></div><div class="col-md-3 col-sm-12  form-group"><input type="email" placeholder="Email@example.com" class="form-control" name="up_de_email" value="' + data.data[i].source.email + '" disabled></div><div class="col-md-3 col-sm-12  form-group"><input type="number" placeholder="Days" class="form-control" name="up_de_session_expire" value="0"></div><div class="col-md-3 col-sm-12 form-group"><select class="form-control" name="up_de_permissions"><option selected hidden value="'+ data.data[i].source.permissions +'">'+ data.data[i].source.permissions +'</option><option value="Height">Height</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div></div>'
+                        {% elif user.permissions == 'Medium'%}
+                            s += '<div class="row"><div class="col-md-3 col-sm-12  form-group"><input type="text" placeholder="Name" class="form-control" name="up_de_name" value="'+ data.data[i].source.name +'" ></div><div class="col-md-3 col-sm-12  form-group"><input type="email" placeholder="Email@example.com" class="form-control" name="up_de_email" value="' + data.data[i].source.email + '" disabled></div><div class="col-md-3 col-sm-12  form-group"><input type="number" placeholder="Days" class="form-control" name="up_de_session_expire" value="0"></div><div class="col-md-3 col-sm-12 form-group"><select class="form-control" name="up_de_permissions"><option selected hidden value="Low">Low</option><option value="Low" >Low</option></select></div></div>'
+                        {% endif %}
+                    }
+                    s += '<button type="btn" class="btn btn-primary" onclick="update_default()">變更</button>'
+                    document.getElementById('show_default_data').innerHTML = s
+                    $('#show_default').fadeIn();
+                }
+            });
+                 
+        }else{
+            alert('請選擇資料') 
+        } 
+
+    })  
+
+
     function update_default(){
-        var value_ = get_default_check_box()
-        console.log(value_)
+        var name = document.getElementsByName('up_de_name')
+        var email = document.getElementsByName('up_de_email')
+        var session_expire = document.getElementsByName('up_de_session_expire')
+        var permissions = document.getElementsByName('up_de_permissions')
+        document.getElementById('default_loading').style.display = 'block'
+        var up_data = []
+        for(i=0; i< name.length; i++){
+            var n = name[i].value
+            var e = email[i].value
+            var s = session_expire[i].value
+            var p = permissions[i].value
+            up_data.push({'name':n ,'email':e, 'session_expire':s, 'permissions':p})
+        }
+        $.ajax({
+            url: '/update/',  
+            type: 'POST',  
+            headers: {'X-CSRFToken': $('[name="csrfmiddlewaretoken"]').val()},
+            data: {
+                up_list: JSON.stringify(up_data),
+            },  
+            success: function (data) {
+                var data = JSON.parse(data);
+                if(data.data.status == 'success'){
+                    window.location.replace(location.href)
+                }else{
+                    alert('更新失敗')
+                }
+            }  
+        });  
     }
 
 

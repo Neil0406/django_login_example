@@ -19,7 +19,7 @@
         .container {
             margin-top: 10%;
             width: 450px;
-            height: 480px;
+            height: 500px;
             background-color:rgb(38, 37, 37);      
             border: 1px solid #fff;
           
@@ -42,6 +42,7 @@
             <form method="POST" class="post-form" action="">
                 {% csrf_token %}
                 <h5 style="text-align: center;  margin-top: 10px;">申請帳號</h5>
+                <div class="spinner-border text-danger" role="status" style="display: none;" id='loanding'></div>
                 <div class="form-group" >
                     <label for="exampleDropdownFormEmail2">姓名 (暱稱)</label>
                     <input type="text" class="form-control" placeholder="Your Name" name="name" required>
@@ -60,7 +61,7 @@
                 </div>
                 <h6 style="color: red;">{{info}}</h6>
 
-                <button type="submit" class="btn btn-primary" style="width: 50%;">確認</button>
+                <button type="submit" class="btn btn-primary" style="width: 50%;" onclick="loanding()">確認</button>
                 <button type="reset" class="btn btn-primary">清除</button> 
                 <a href="../" class="btn btn-primary">回上一頁</a>
                 <br>
@@ -83,6 +84,9 @@ crossorigin="anonymous"></script>
 
 
 <script>
+    function loanding(){
+        document.getElementById('loanding').style.display = 'block';
+    }
     $(document).ready(function(){
         $("body").on("change", "#email", function (){
             $Emailchecking=IsEmail($("#email").val());

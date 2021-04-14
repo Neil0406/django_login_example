@@ -40,7 +40,7 @@ class CreateIndex():
                     "format": "epoch_second"
                 },
                 'permissions':{
-                    "type": "integer"
+                    "type": "keyword"
                 },
                 'picture':{
                     "type": "keyword",
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         'email':email, 
         'password_key': key,
         'password_value': encryptstr,
-        'permissions' : 2,
+        'permissions' : 'Height',
         'updated': int(datetime),
         'created': int(datetime)
     }
